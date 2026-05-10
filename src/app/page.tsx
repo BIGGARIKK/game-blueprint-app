@@ -18,7 +18,7 @@ import PresetSelector from '@/components/ui/PresetSelector';
 import ProjectManagerModal from '@/components/ui/ProjectManagerModal';
 import TodoListSidebar from '@/components/ui/TodoListSidebar';
 import StickyNote from '@/components/canvas/StickyNote';
-
+import ProjectAnalyticsModal from '@/components/ui/ProjectAnalyticsModal';
 
 function WorkspaceContent() {
   const { 
@@ -34,6 +34,7 @@ function WorkspaceContent() {
   const [isProjModalOpen, setIsProjModalOpen] = useState(false);
   const [isTodoOpen, setIsTodoOpen] = useState(true);
   const flowWrapperRef = useRef<HTMLDivElement>(null);
+  const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
 
   // โหลดระบบโปรเจกต์ทั้งหมดทันทีที่เปิดเว็บ
   useEffect(() => {
@@ -84,16 +85,22 @@ function WorkspaceContent() {
         {/* แผงปุ่มฝั่งขวา */}
         <div className="flex items-center gap-2 shrink-0">
           
-          {/* +++ 3. เพิ่มปุ่ม Toggle เปิด/ปิด Master Todo List +++ */}
+          {/* +++ 3. เพิ่มปุ่มเปิดแผง 📊 Analytics วางคู่กับปุ่ม Master Todos +++ */}
+          <button
+            onClick={() => setIsAnalyticsOpen(true)}
+            className="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-400 hover:text-cyan-300 px-3 py-1.5 rounded-md text-xs font-bold transition-all shadow-sm flex items-center gap-1"
+            title="ดูภาพรวมสถิติความคืบหน้าของโปรเจกต์"
+          >
+            <span>📊 Analytics</span>
+          </button>
+
           <button
             onClick={() => setIsTodoOpen(!isTodoOpen)}
             className={`px-3 py-1.5 rounded-md text-xs font-bold transition-all shadow-sm flex items-center gap-1 ${
-              isTodoOpen 
-                ? 'bg-lime-950/80 border border-lime-500 text-lime-400' 
-                : 'bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300'
+              isTodoOpen ? 'bg-lime-950/80 border border-lime-500 text-lime-400' : 'bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-300'
             }`}
           >
-            <span>📋 Master Todos</span>
+            <span>📋 Todos</span>
           </button>
 
           <PresetSelector />
@@ -140,6 +147,9 @@ function WorkspaceContent() {
       {/* +++ 4. วาง Component Popup Dashboard (แสดงเมื่อกดปุ่มบน Header) +++ */}
       {isProjModalOpen && (
         <ProjectManagerModal onClose={() => setIsProjModalOpen(false)} />
+      )}
+      {isAnalyticsOpen && (
+        <ProjectAnalyticsModal onClose={() => setIsAnalyticsOpen(false)} />
       )}
 
     </div>
