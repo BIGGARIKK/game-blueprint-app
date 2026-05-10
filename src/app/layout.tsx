@@ -1,12 +1,12 @@
 import type { Metadata } from 'next';
-// 1. ดึงฟอนต์ Kanit จาก Google Fonts แบบ Built-in
-import { Kanit } from 'next/font/google';
+// 1. เปลี่ยนจาก Kanit เป็น Noto_Sans_Thai ที่ออกแบบมาเพื่อ UI ขนาดเล็กโดยเฉพาะ
+import { Noto_Sans_Thai } from 'next/font/google';
 import './globals.css';
 
-// 2. ตั้งค่าค่าน้ำหนักฟอนต์ (บาง, ปกติ, หนา) และรองรับภาษาไทย
-const kanit = Kanit({
+// ดึงน้ำหนักฟอนต์มาให้ครบ (บาง, ปกติ, หนาปานกลาง, หนา)
+const notoSansThai = Noto_Sans_Thai({
   subsets: ['latin', 'thai'],
-  weight: ['300', '400', '500', '600', '700', '900'],
+  weight: ['300', '400', '500', '600', '700'],
   display: 'swap',
 });
 
@@ -22,8 +22,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="th">
-      {/* 3. เอา kanit.className มาใส่ที่ body ฟอนต์จะเปลี่ยนทั้งเว็บทันที */}
-      <body className={`${kanit.className} bg-slate-950 text-slate-100 antialiased`}>
+      {/* 2. คลาส antialiased จะช่วยปรับขอบฟอนต์บนพื้นมืดให้เรียบเนียน ไม่บวมหนา */}
+      <body className={`${notoSansThai.className} bg-slate-950 text-slate-100 antialiased`}>
         {children}
       </body>
     </html>

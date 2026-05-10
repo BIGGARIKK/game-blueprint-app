@@ -4,14 +4,28 @@ import { useCanvasStore } from '@/store/useCanvasStore';
 const categories = ['UI', 'Scripting', 'Database', 'Networking', 'Art', 'Sound'] as const;
 
 export default function QuickAddBar() {
-  const addNode = useCanvasStore((state) => state.addNode);
-
+  const { addNode, addGroup, addStickyNote } = useCanvasStore();
   return (
-    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 px-4 py-2 rounded-full shadow-2xl flex items-center gap-2 z-10">
+    <div className="absolute bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 px-4 py-2 rounded-full shadow-2xl flex items-center gap-2 z-10 overflow-x-auto max-w-full">
       <span className="text-xs font-bold text-slate-400 mr-1 hidden sm:inline">➕ Quick Add:</span>
       
+      {/* +++ ปุ่มเพิ่มกล่องกลุ่ม (Group Container) +++ */}
+      <button
+        onClick={addGroup}
+        className="px-3 py-1 rounded-full text-xs font-bold bg-cyan-950/60 border border-dashed border-cyan-400 text-cyan-300 hover:bg-cyan-900 hover:scale-105 transition-all shadow-sm flex items-center gap-1 mr-1"
+      >
+        📦 Group
+      </button>
+      <button
+        onClick={addStickyNote}
+        className="px-3 py-1 rounded-full text-xs font-bold bg-amber-500/20 border border-dashed border-amber-500 text-amber-500 hover:bg-amber-500 hover:text-slate-950 hover:scale-105 transition-all shadow-sm flex items-center gap-1 mr-1"
+      >
+        📝 Note
+      </button>
+
+      <span className="text-slate-700 select-none">|</span>
+
       {categories.map((cat) => {
-        // กำหนดสีปุ่มตามแผนก
         let btnColor = 'hover:border-slate-400 text-slate-300';
         if (cat === 'UI') btnColor = 'hover:border-pink-500 hover:text-pink-400';
         if (cat === 'Scripting') btnColor = 'hover:border-lime-500 hover:text-lime-400';
@@ -28,6 +42,7 @@ export default function QuickAddBar() {
           >
             + {cat}
           </button>
+          
         );
       })}
     </div>
