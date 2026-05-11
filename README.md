@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎮 DEV BLUEPRINT - Game Architecture & System Designer
 
-## Getting Started
+**DEV BLUEPRINT** คือเว็บแอปพลิเคชันสำหรับนักพัฒนาเกมและวิศวกรซอฟต์แวร์ เพื่อใช้ออกแบบผังสถาปัตยกรรมระบบ (System Architecture) วางแผนลอจิก และติดตามความคืบหน้าของโปรเจกต์ผ่านกราฟิกโหนดแบบอินเทอร์แอกทีฟ (Interactive Node-based) 
 
-First, run the development server:
+ทำงานได้อย่างรวดเร็ว ปลอดภัย และจบครบในเบราว์เซอร์ของคุณ 100% โดยไม่ต้องพึ่งพา Backend
+
+---
+
+## ✨ ฟีเจอร์หลัก (Key Features)
+
+- **📐 Smart Hybrid Layout (Dagre + Manual):** ระบบจัดวางโหนดอัตโนมัติที่ชาญฉลาด ป้องกันการทับซ้อน แต่ยังคงจดจำพิกัดและขนาดกล่อง (Group Container) ตามที่ผู้ใช้ปรับแต่งเองได้อย่างแม่นยำ
+- **🗂️ Multi-Project Workspace:** สลับการทำงานระหว่างหลาย ๆ เกมหรือหลายโปรเจกต์ได้ทันที ข้อมูลทั้งหมดถูกแยกเก็บอย่างเป็นระเบียบ
+- **📋 Master Todo & Bug Tracker:** ติดตามภาพรวมความคืบหน้าของงานย่อย พร้อมระบบแจ้งเตือน **"🚨 จุดติดบั๊กวิกฤต"** สีแดงกะพริบเด่นชัดบนแผง Sidebar
+- **📝 Freestyle Brainstorming:** รองรับการวางกระดาษโน้ต (Sticky Notes) สีเหลืองสไตล์ Post-it เพื่อจดไอเดียลอจิกข้ามระบบได้อย่างอิสระ
+- **📊 Health Analytics Dashboard:** สรุปสถิติสุขภาพของโปรเจกต์แบบกราฟิก โชว์สัดส่วนภาระงาน (Workload) แยกตามแผนก พร้อมให้กด `Win+Shift+S` แคปหน้าจอส่งรายงานความคืบหน้าได้ทันที
+- **🤖 AI Docs-as-Prompt:** ระบบสร้าง Context และคำสั่งดักทาง Schema อัจฉริยะ สำหรับก๊อปปี้ไปสั่งงานต่อใน ChatGPT, Claude หรือ Gemini ได้โดยที่ AI ไม่มั่วโครงสร้าง
+- **💻 VS Code Code Editor:** ฝัง Monaco Editor เบื้องหลัง โชว์เลขบรรทัดและไฮไลต์สีสัน JSON สวยงาม พร้อมระบบแจ้งเตือน Syntax Error ทันทีที่พิมพ์ผิด
+- **🔒 Client-Side Secure Backup:** บันทึกข้อมูลลง LocalStorage อัตโนมัติ พร้อมรองรับการ Import / Export ไฟล์ `.json` เพื่อแชร์งานให้ทีมหรือสำรองข้อมูลลงเครื่อง
+
+---
+
+## 🛠️ เทคโนโลยีที่ใช้ (Tech Stack)
+
+- **Framework:** [Next.js](https://nextjs.org/) (App Router)
+- **Visual Nodes Engine:** [React Flow (@xyflow/react)](https://reactflow.dev/) + [Dagre](https://github.com/dagrejs/dagre)
+- **State Management:** [Zustand](https://zustand-demo.pmnd.rs/)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+- **Typography:** [Noto Sans Thai](https://fonts.google.com/specimen/Noto+Sans+Thai) (ปรับแต่งเพื่อ UI ขนาดเล็กให้อ่านง่าย คมชัด)
+- **Code Editor:** [@monaco-editor/react](https://github.com/suren-atoyan/monaco-react)
+
+---
+
+## 🚀 เริ่มต้นการใช้งาน (Getting Started)
+
+### 1. การติดตั้ง (Installation)
+โคลนโปรเจกต์ลงมาที่เครื่องของคุณ และติดตั้งแพ็กเกจที่จำเป็น:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+git clone <your-repo-url>
+cd game-architecture-blueprint
+npm install
