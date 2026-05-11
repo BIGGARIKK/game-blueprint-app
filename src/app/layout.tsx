@@ -1,18 +1,18 @@
 import type { Metadata } from 'next';
-// 1. เปลี่ยนจาก Kanit เป็น Noto_Sans_Thai ที่ออกแบบมาเพื่อ UI ขนาดเล็กโดยเฉพาะ
-import { Noto_Sans_Thai } from 'next/font/google';
+// 1. Import แค่ IBM Plex Sans Thai ตัวเดียวจบ
+import { IBM_Plex_Sans_Thai } from 'next/font/google';
 import './globals.css';
 
-// ดึงน้ำหนักฟอนต์มาให้ครบ (บาง, ปกติ, หนาปานกลาง, หนา)
-const notoSansThai = Noto_Sans_Thai({
-  subsets: ['latin', 'thai'],
+const ibmPlexThai = IBM_Plex_Sans_Thai({
+  variable: '--font-ibm-plex-thai',
+  subsets: ['thai', 'latin'], // คลุมทั้งไทยและอังกฤษ
   weight: ['300', '400', '500', '600', '700'],
   display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: 'Game Architecture Blueprint',
-  description: 'Node-based system designer for game developers',
+  title: 'DEV BLUEPRINT - Game Architecture Designer',
+  description: 'Interactive node-based system designer for game developers',
 };
 
 export default function RootLayout({
@@ -22,8 +22,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="th">
-      {/* 2. คลาส antialiased จะช่วยปรับขอบฟอนต์บนพื้นมืดให้เรียบเนียน ไม่บวมหนา */}
-      <body className={`${notoSansThai.className} bg-slate-950 text-slate-100 antialiased`}>
+      <body 
+        // 2. ยัดตัวแปรเดียวลง body
+        className={`
+          ${ibmPlexThai.variable} 
+          font-sans bg-slate-950 text-slate-100 antialiased select-none
+        `}
+      >
         {children}
       </body>
     </html>
