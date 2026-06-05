@@ -1,7 +1,6 @@
 "use client";
 
-import React, { useMemo, useState, useEffect, useRef } from 'react';
-// +++ 1. Import NodeTypes เข้ามาเพิ่ม +++
+import React, { useState, useEffect, useRef } from 'react';
 import { ReactFlow, Background, Controls, MiniMap, ReactFlowProvider, NodeTypes } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { PanelLeftClose, PanelLeft } from 'lucide-react';
@@ -19,6 +18,13 @@ import ProjectManagerModal from '@/components/ui/ProjectManagerModal';
 import TodoListSidebar from '@/components/ui/TodoListSidebar';
 import StickyNote from '@/components/canvas/StickyNote';
 import ProjectAnalyticsModal from '@/components/ui/ProjectAnalyticsModal';
+
+// +++ ย้าย nodeTypes มาไว้นอก Component และใช้ as unknown as NodeTypes เพื่อแก้ปัญหา ESLint ของ Vercel +++
+const nodeTypes = { 
+  featureNode: FeatureNode,
+  groupNode: GroupNode,
+  stickyNote: StickyNote 
+} as unknown as NodeTypes;
 
 function WorkspaceContent() {
   const { 
@@ -38,13 +44,6 @@ function WorkspaceContent() {
   useEffect(() => {
     initProjects();
   }, [initProjects]);
-
-  // +++ 2. ใส่ Type NodeTypes และใช้ as any เพื่อแก้ปัญหา TypeScript Error +++
-  const nodeTypes: NodeTypes = useMemo(() => ({ 
-    featureNode: FeatureNode as any,
-    groupNode: GroupNode as any,
-    stickyNote: StickyNote as any 
-  }), []);
 
   const handleExportPNG = async () => {
     if (!flowWrapperRef.current) return;
