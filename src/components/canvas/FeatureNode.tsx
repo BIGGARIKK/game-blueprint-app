@@ -11,7 +11,8 @@ const categoryStyles: Record<string, { bg: string; text: string; border: string;
   Sound: { bg: 'bg-emerald-950/40', text: 'text-emerald-400', border: 'border-emerald-500/30', glow: 'shadow-[0_0_15px_rgba(16,185,129,0.15)]', bar: 'from-emerald-500 to-teal-400', handle: '!bg-emerald-500' },
 };
 
-export default function FeatureNode({ id, data }: NodeProps<FeatureNodeData>) {
+// +++ แก้ไขตรงนี้: เติม & { parentId?: string } เพื่อบอก TypeScript ว่าโหนดนี้อาจจะมีหรือไม่มีกล่องแม่ก็ได้ +++
+export default function FeatureNode({ id, data }: NodeProps<FeatureNodeData & { parentId?: string }>) {
   const toggleTask = useCanvasStore((state) => state.toggleTask);
   
   const style = categoryStyles[data.category || 'Scripting'] || {
@@ -22,14 +23,12 @@ export default function FeatureNode({ id, data }: NodeProps<FeatureNodeData>) {
   const completedTasks = (data.tasks || []).filter((t) => t.done).length;
   const progressPercent = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
-  // +++ ฟังก์ชันเรนเดอร์ป้ายความสำคัญ +++
   const renderPriority = () => {
     if (data.priority === 'high') return <span className="bg-orange-500/20 text-orange-400 border border-orange-500/40 px-1.5 py-0.5 rounded text-[9px] font-bold">🔥 HIGH</span>;
     if (data.priority === 'medium') return <span className="bg-amber-500/20 text-amber-400 border border-amber-500/40 px-1.5 py-0.5 rounded text-[9px] font-bold">⚡ MED</span>;
-    return null; // แบบ Low หลบให้หน้าจอไม่รก
+    return null;
   };
 
-  // +++ ฟังก์ชันเรนเดอร์ป้ายสถานะ (ป้าย Bug จะสว่างเรืองแสงและกะพริบเด่นที่สุด) +++
   const renderStatus = () => {
     if (data.status === 'bug') {
       return (
@@ -48,7 +47,6 @@ export default function FeatureNode({ id, data }: NodeProps<FeatureNodeData>) {
       <Handle type="target" position={Position.Left} className={`!w-2.5 !h-8 ${style.handle} !border-2 !border-slate-950 !rounded-md !-left-3 cursor-crosshair transition-transform hover:scale-125 z-20`} />
 
       <div className="rounded-xl overflow-hidden">
-        {/* Header แผนก */}
         <div className={`p-2.5 px-3 ${style.bg} border-b border-slate-800/80 flex items-center justify-between`}>
           <span className={`px-2 py-0.5 rounded-md text-[11px] font-semibold tracking-wide border border-current/20 ${style.text}`}>
             {data.category || 'Scripting'}
@@ -58,15 +56,11 @@ export default function FeatureNode({ id, data }: NodeProps<FeatureNodeData>) {
           </span>
         </div>
 
-        {/* Progress Bar */}
         <div className="w-full bg-slate-950/60 h-1">
           <div className={`bg-gradient-to-r ${style.bar} h-1 transition-all duration-500 ease-out`} style={{ width: `${progressPercent}%` }} />
         </div>
 
-        {/* Body */}
         <div className="p-4">
-          
-          {/* +++ โซนป้าย Priority และ Status ลอยอยู่เหนือชื่อโหนด +++ */}
           <div className="flex items-center gap-1.5 mb-2">
             {renderStatus()}
             {renderPriority()}
@@ -76,7 +70,6 @@ export default function FeatureNode({ id, data }: NodeProps<FeatureNodeData>) {
             {data.label}
           </h3>
 
-          {/* Tasks */}
           <div className="space-y-2">
             {(data.tasks || []).map((task) => (
               <label 

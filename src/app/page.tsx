@@ -122,9 +122,7 @@ function WorkspaceContent() {
             onEdgeClick={(_, edge) => setSelectedEdgeId(edge.id)}
             onPaneClick={() => { setSelectedNodeId(null); setSelectedEdgeId(null); }}
             
-            // +++ 2. ใส่คอมเมนต์ // @ts-ignore ไว้เหนือบรรทัดที่มีปัญหา เพื่อปิดการตรวจ Type ของ TypeScript +++
-            // @ts-ignore
-            nodeTypes={nodeTypes}
+            nodeTypes={nodeTypes} // กลับมาใส่แบบปกติได้เลย!
             
             fitView
             colorMode="dark"
