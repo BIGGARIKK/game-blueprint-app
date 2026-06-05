@@ -1,5 +1,6 @@
 import React from 'react';
-import { Handle, Position, NodeProps } from '@xyflow/react';
+// +++ 1. Import `Node` เข้ามาเพิ่มจาก @xyflow/react +++
+import { Handle, Position, NodeProps, Node } from '@xyflow/react';
 import { FeatureNodeData, useCanvasStore } from '@/store/useCanvasStore';
 
 const categoryStyles: Record<string, { bg: string; text: string; border: string; glow: string; bar: string; handle: string }> = {
@@ -11,8 +12,11 @@ const categoryStyles: Record<string, { bg: string; text: string; border: string;
   Sound: { bg: 'bg-emerald-950/40', text: 'text-emerald-400', border: 'border-emerald-500/30', glow: 'shadow-[0_0_15px_rgba(16,185,129,0.15)]', bar: 'from-emerald-500 to-teal-400', handle: '!bg-emerald-500' },
 };
 
-// +++ แก้ไขตรงนี้: เติม & { parentId?: string } เพื่อบอก TypeScript ว่าโหนดนี้อาจจะมีหรือไม่มีกล่องแม่ก็ได้ +++
-export default function FeatureNode({ id, data }: NodeProps<FeatureNodeData & { parentId?: string }>) {
+// +++ 2. ประกาศ Type ใหม่ โดยเอา Node มาครอบ FeatureNodeData ไว้ +++
+export type CustomFeatureNode = Node<FeatureNodeData, 'featureNode'>;
+
+// +++ 3. เปลี่ยนมารับ Type CustomFeatureNode ที่เราสร้างขึ้นมาใหม่ +++
+export default function FeatureNode({ id, data }: NodeProps<CustomFeatureNode>) {
   const toggleTask = useCanvasStore((state) => state.toggleTask);
   
   const style = categoryStyles[data.category || 'Scripting'] || {
@@ -26,7 +30,7 @@ export default function FeatureNode({ id, data }: NodeProps<FeatureNodeData & { 
   const renderPriority = () => {
     if (data.priority === 'high') return <span className="bg-orange-500/20 text-orange-400 border border-orange-500/40 px-1.5 py-0.5 rounded text-[9px] font-bold">🔥 HIGH</span>;
     if (data.priority === 'medium') return <span className="bg-amber-500/20 text-amber-400 border border-amber-500/40 px-1.5 py-0.5 rounded text-[9px] font-bold">⚡ MED</span>;
-    return null;
+    return null; 
   };
 
   const renderStatus = () => {
