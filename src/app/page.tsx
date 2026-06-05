@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useMemo, useState, useEffect, useRef } from 'react';
-import { ReactFlow, Background, Controls, MiniMap, ReactFlowProvider } from '@xyflow/react';
+// +++ 1. Import NodeTypes เข้ามาเพิ่ม +++
+import { ReactFlow, Background, Controls, MiniMap, ReactFlowProvider, NodeTypes } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { PanelLeftClose, PanelLeft } from 'lucide-react';
 import { toPng } from 'html-to-image';
@@ -14,7 +15,6 @@ import QuickAddBar from '@/components/ui/QuickAddBar';
 import NodeInspector from '@/components/ui/NodeInspector';
 import EdgeInspector from '@/components/ui/EdgeInspector';
 import PresetSelector from '@/components/ui/PresetSelector';
-// +++ 1. Import แผง Dashboard Modal เข้ามา +++
 import ProjectManagerModal from '@/components/ui/ProjectManagerModal';
 import TodoListSidebar from '@/components/ui/TodoListSidebar';
 import StickyNote from '@/components/canvas/StickyNote';
@@ -24,28 +24,27 @@ function WorkspaceContent() {
   const { 
     systemName, nodes, edges, onNodesChange, onEdgesChange, 
     onConnect, setSelectedNodeId, setSelectedEdgeId,
-    initProjects // +++ ดึงฟังก์ชันโหลดโปรเจกต์ตั้งต้น +++
+    initProjects 
   } = useCanvasStore();
   
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
   
-  // +++ 2. เพิ่ม State ควบคุมการเปิด/ปิด Dashboard Modal +++
   const [isProjModalOpen, setIsProjModalOpen] = useState(false);
   const [isTodoOpen, setIsTodoOpen] = useState(true);
   const flowWrapperRef = useRef<HTMLDivElement>(null);
   const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
 
-  // โหลดระบบโปรเจกต์ทั้งหมดทันทีที่เปิดเว็บ
   useEffect(() => {
     initProjects();
   }, [initProjects]);
 
-  const nodeTypes = useMemo(() => ({ 
-  featureNode: FeatureNode,
-  groupNode: GroupNode,
-  stickyNote: StickyNote // +++ ลงทะเบียน
-}), []);
+  // +++ 2. ใส่ Type NodeTypes และใช้ as any เพื่อแก้ปัญหา TypeScript Error +++
+  const nodeTypes: NodeTypes = useMemo(() => ({ 
+    featureNode: FeatureNode as any,
+    groupNode: GroupNode as any,
+    stickyNote: StickyNote as any 
+  }), []);
 
   const handleExportPNG = async () => {
     if (!flowWrapperRef.current) return;
@@ -62,15 +61,12 @@ function WorkspaceContent() {
     }
   };
 
-  
-
   return (
     <div className="w-screen h-screen bg-slate-950 flex flex-col font-sans overflow-hidden">
       
       {/* Top Navbar */}
       <header className="h-14 bg-slate-900 border-b border-slate-800 flex items-center px-4 justify-between text-white z-20">
         <div className="flex items-center gap-3 truncate pr-2">
-          {/* ... ปุ่มซ่อน Editor และป้ายชื่อเกม เหมือนเดิม ... */}
           <button onClick={() => setIsEditorOpen(!isEditorOpen)} className="p-2 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-lg border border-slate-700 transition-all shrink-0">
             {isEditorOpen ? <PanelLeftClose size={18} /> : <PanelLeft size={18} />}
           </button>
@@ -84,8 +80,6 @@ function WorkspaceContent() {
 
         {/* แผงปุ่มฝั่งขวา */}
         <div className="flex items-center gap-2 shrink-0">
-          
-          {/* +++ 3. เพิ่มปุ่มเปิดแผง 📊 Analytics วางคู่กับปุ่ม Master Todos +++ */}
           <button
             onClick={() => setIsAnalyticsOpen(true)}
             className="bg-slate-800 hover:bg-slate-700 border border-slate-700 text-cyan-400 hover:text-cyan-300 px-3 py-1.5 rounded-md text-xs font-bold transition-all shadow-sm flex items-center gap-1"
@@ -144,7 +138,6 @@ function WorkspaceContent() {
         <EdgeInspector />
       </div>
 
-      {/* +++ 4. วาง Component Popup Dashboard (แสดงเมื่อกดปุ่มบน Header) +++ */}
       {isProjModalOpen && (
         <ProjectManagerModal onClose={() => setIsProjModalOpen(false)} />
       )}
