@@ -12,8 +12,8 @@ const categoryStyles: Record<string, { bg: string; text: string; border: string;
   Sound: { bg: 'bg-emerald-950/40', text: 'text-emerald-400', border: 'border-emerald-500/30', glow: 'shadow-[0_0_15px_rgba(16,185,129,0.15)]', bar: 'from-emerald-500 to-teal-400', handle: '!bg-emerald-500' },
 };
 
-// +++ 2. สร้าง Type ใหม่ โดยเอา Node<> มาครอบ FeatureNodeData ไว้ และดักปัญหา parentId ไปในตัว +++
-type CustomFeatureNode = Node<FeatureNodeData & { parentId?: string }, 'featureNode'>;
+// +++ 2. สร้าง Type ใหม่ โดยเอา Node<> มาครอบ FeatureNodeData ไว้ +++
+type CustomFeatureNode = Node<FeatureNodeData, 'featureNode'>;
 
 // +++ 3. เปลี่ยนมารับ Type CustomFeatureNode ที่เราสร้างไว้ +++
 export default function FeatureNode({ id, data }: NodeProps<CustomFeatureNode>) {

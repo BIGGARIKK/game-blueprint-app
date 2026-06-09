@@ -1,19 +1,22 @@
 import React from 'react';
 import { useReactFlow } from '@xyflow/react';
-import { useCanvasStore } from '@/store/useCanvasStore';
+import { useCanvasStore, FeatureNode, GroupNode } from '@/store/useCanvasStore';
+
+const isFeatureNode = (node: any): node is FeatureNode => node.type === 'featureNode';
+const isGroupNode = (node: any): node is GroupNode => node.type === 'groupNode';
 
 export default function TodoListSidebar({ onClose }: { onClose: () => void }) {
   const { nodes, edges, setSelectedNodeId, toggleTask } = useCanvasStore();
   const { fitView } = useReactFlow();
 
   const targetIds = new Set(edges.map((e) => e.target));
-  const rootNodes = nodes.filter((n) => n.type !== 'groupNode' && n.type !== 'stickyNote' && !targetIds.has(n.id));
+  const rootNodes = nodes.filter((n): n is FeatureNode => isFeatureNode(n) && !targetIds.has(n.id));
 
   // +++ 1. กรองเฉพาะโหนดที่ผู้ใช้แปะป้ายว่าติดบั๊ก (status === 'bug') +++
-  const bugNodes = nodes.filter((n) => n.type !== 'groupNode' && n.type !== 'stickyNote' && n.data.status === 'bug');
+  const bugNodes = nodes.filter((n): n is FeatureNode => isFeatureNode(n) && n.data.status === 'bug');
 
-  const groupNodes = nodes.filter((n) => n.type === 'groupNode');
-  const standaloneNodes = nodes.filter((n) => n.type !== 'groupNode' && n.type !== 'stickyNote' && !n.parentId);
+  const groupNodes = nodes.filter((n): n is GroupNode => isGroupNode(n));
+  const standaloneNodes = nodes.filter((n): n is FeatureNode => isFeatureNode(n) && !n.parentId);
 
   const handleFocusNode = (nodeId: string) => {
     setSelectedNodeId(nodeId);
@@ -121,7 +124,7 @@ export default function TodoListSidebar({ onClose }: { onClose: () => void }) {
           <div className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2 px-1">📦 รายการงานแยกตามระบบ</div>
           <div className="space-y-3">
             {groupNodes.map((group) => {
-              const childNodes = nodes.filter((n) => n.parentId === group.id);
+              const childNodes = nodes.filter((n): n is FeatureNode => isFeatureNode(n) && n.parentId === group.id);
               return (
                 <div key={`glist-${group.id}`} className="bg-slate-950/40 border border-slate-800/80 rounded-lg p-2">
                   <div className="text-xs font-bold text-cyan-400 mb-2 truncate px-1 flex items-center justify-between"><span>📁 {group.data.label}</span></div>
@@ -134,7 +137,7 @@ export default function TodoListSidebar({ onClose }: { onClose: () => void }) {
                             <div className="text-[11px] font-medium text-slate-200 group-hover:text-white truncate">↳ {child.data.label}</div>
                           </div>
                           <div className="space-y-1 pl-3">
-                            {(child.data.tasks || []).map((task) => (
+                            {child.data.tasks.map((task) => (
                               <div key={`ctask-${task.id}`} onClick={(e) => { e.stopPropagation(); toggleTask(child.id, task.id); }} className="flex items-center gap-1.5 text-[10px] text-slate-400 hover:text-slate-200">
                                 <input type="checkbox" checked={task.done} readOnly className="w-2.5 h-2.5 rounded bg-slate-950 border-slate-700 text-cyan-500" />
                                 <span className={`truncate ${task.done ? 'line-through text-slate-600' : ''}`}>{task.text}</span>
@@ -160,7 +163,7 @@ export default function TodoListSidebar({ onClose }: { onClose: () => void }) {
                         <div className="text-[11px] font-medium text-slate-300 group-hover:text-white truncate">• {node.data.label}</div>
                       </div>
                       <div className="space-y-1 pl-2">
-                        {(node.data.tasks || []).map((task) => (
+                        {node.data.tasks.map((task) => (
                           <div key={`stask-${task.id}`} onClick={(e) => { e.stopPropagation(); toggleTask(node.id, task.id); }} className="flex items-center gap-1.5 text-[10px] text-slate-400">
                             <input type="checkbox" checked={task.done} readOnly className="w-2.5 h-2.5 rounded bg-slate-950 border-slate-700 text-lime-500" />
                             <span className={`truncate ${task.done ? 'line-through text-slate-600' : ''}`}>{task.text}</span>

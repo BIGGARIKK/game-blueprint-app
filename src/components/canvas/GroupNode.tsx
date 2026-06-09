@@ -1,7 +1,7 @@
 import React from 'react';
-import { NodeProps } from '@xyflow/react';
+import { Node, NodeProps } from '@xyflow/react';
 
-export default function GroupNode({ data, selected }: NodeProps<{ label: string }>) {
+export default function GroupNode({ data, selected }: NodeProps<Node<{ label: string }, 'groupNode'>>) {
   return (
     // w-full h-full จะถูกขยายขนาดอัตโนมัติตามที่ Dagre คำนวณมาให้
     <div 

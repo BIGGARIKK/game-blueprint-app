@@ -11,13 +11,19 @@ export type Task = { id: string; text: string; done: boolean; };
 export type PriorityType = 'high' | 'medium' | 'low';
 export type StatusType = 'planned' | 'in_progress' | 'review' | 'bug';
 
-export type FeatureNodeData = {
+export interface FeatureNodeData extends Record<string, unknown> {
   label: string;
-  category?: 'UI' | 'Scripting' | 'Database' | 'Networking' | 'Art' | 'Sound';
-  tasks?: Task[];
-  priority?: PriorityType;
-  status?: StatusType;
-};
+  category: string;
+  priority: string;
+  status: string;
+  tasks: any[];
+}
+
+export type SimpleNodeData = { label: string } & Record<string, unknown>;
+export type FeatureNode = Node<FeatureNodeData, 'featureNode'>;
+export type GroupNode = Node<SimpleNodeData, 'groupNode'>;
+export type StickyNoteNode = Node<SimpleNodeData, 'stickyNote'>;
+export type BlueprintNode = FeatureNode | GroupNode | StickyNoteNode;
 
 export type ProjectMeta = {
   id: string;
@@ -30,7 +36,7 @@ type CanvasState = {
   projects: ProjectMeta[];
   systemName: string;
   currentJSON: string;
-  nodes: Node<FeatureNodeData>[];
+  nodes: BlueprintNode[];
   edges: Edge[];
   selectedNodeId: string | null;
   selectedEdgeId: string | null;
@@ -70,7 +76,7 @@ const createEdgeStyle = (color: string) => ({
   labelBgStyle: { fill: '#0f172a', fillOpacity: 0.85 },
 });
 
-const getLayoutedElements = (nodes: Node<FeatureNodeData>[], edges: Edge[], direction = 'LR') => {
+const getLayoutedElements = (nodes: BlueprintNode[], edges: Edge[], direction = 'LR') => {
   const dagreGraph = new dagre.graphlib.Graph({ compound: true });
   dagreGraph.setDefaultEdgeLabel(() => ({}));
   dagreGraph.setGraph({ rankdir: direction, nodesep: 110, ranksep: 200 });
@@ -127,7 +133,7 @@ const getLayoutedElements = (nodes: Node<FeatureNodeData>[], edges: Edge[], dire
 };
 
 // +++ 2. อัปเดต Export JSON ให้พ่นค่า priority และ status ออกไปด้วย +++
-const generateExportJSON = (systemName: string, nodes: Node<FeatureNodeData>[], edges: Edge[]) => {
+const generateExportJSON = (systemName: string, nodes: BlueprintNode[], edges: Edge[]) => {
   const exportObject = {
     systemName,
     nodes: nodes.map((n) => {
@@ -318,7 +324,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => {
 
     onNodesChange: (changes) => {
       const newNodes = applyNodeChanges(changes, get().nodes);
-      set({ nodes: newNodes as Node<FeatureNodeData>[] });
+      set({ nodes: newNodes as BlueprintNode[] });
       if (changes.some((c) => c.type === 'remove' || (c.type === 'position' && !c.dragging))) {
         const updatedJSON = generateExportJSON(get().systemName, get().nodes, get().edges);
         set({ currentJSON: updatedJSON });
@@ -345,9 +351,9 @@ export const useCanvasStore = create<CanvasState>((set, get) => {
 
     addNode: (category) => {
       const uniqueId = `${category.toLowerCase()}_${Date.now().toString().slice(-4)}`;
-      const newNode: Node<FeatureNodeData> = { 
-        id: uniqueId, type: 'featureNode', position: { x: 250 + Math.random() * 50, y: 150 + Math.random() * 50 }, 
-        data: { label: `ระบบ ${category} ใหม่`, category: category, priority: 'low', status: 'planned', tasks: [{ id: `t-init-${Date.now()}`, text: 'งานเริ่มต้น', done: false }] } 
+      const newNode: FeatureNode = {
+        id: uniqueId, type: 'featureNode', position: { x: 250 + Math.random() * 50, y: 150 + Math.random() * 50 },
+        data: { label: `ระบบ ${category} ใหม่`, category: category, priority: 'low', status: 'planned', tasks: [{ id: `t-init-${Date.now()}`, text: 'งานเริ่มต้น', done: false }] },
       };
       const { nodes: finalNodes, edges: finalEdges } = getLayoutedElements([...get().nodes, newNode], get().edges);
       const updatedJSON = generateExportJSON(get().systemName, finalNodes, finalEdges);
@@ -357,7 +363,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => {
 
     addGroup: () => {
       const uniqueId = `group_${Date.now().toString().slice(-4)}`;
-      const newGroup: Node<FeatureNodeData> = { id: uniqueId, type: 'groupNode', position: { x: 200, y: 100 }, data: { label: '📦 New Group Module' } };
+      const newGroup: Node<SimpleNodeData, 'groupNode'> = { id: uniqueId, type: 'groupNode', position: { x: 200, y: 100 }, data: { label: '📦 New Group Module' } };
       const { nodes: finalNodes, edges: finalEdges } = getLayoutedElements([...get().nodes, newGroup], get().edges);
       const updatedJSON = generateExportJSON(get().systemName, finalNodes, finalEdges);
       set({ nodes: finalNodes, edges: finalEdges, currentJSON: updatedJSON, selectedNodeId: uniqueId, selectedEdgeId: null });
@@ -366,7 +372,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => {
 
     addStickyNote: () => {
       const uniqueId = `note_${Date.now().toString().slice(-4)}`;
-      const newNote: Node<FeatureNodeData> = { id: uniqueId, type: 'stickyNote', position: { x: 400, y: 200 }, data: { label: '💡 โน้ต: อธิบายลอจิกตรงนี้...' } };
+      const newNote: Node<SimpleNodeData, 'stickyNote'> = { id: uniqueId, type: 'stickyNote', position: { x: 400, y: 200 }, data: { label: '💡 โน้ต: อธิบายลอจิกตรงนี้...' } };
       const updatedNodes = [...get().nodes, newNote];
       const { nodes: finalNodes, edges: finalEdges } = getLayoutedElements(updatedNodes, get().edges);
       const updatedJSON = generateExportJSON(get().systemName, finalNodes, finalEdges);
@@ -375,7 +381,13 @@ export const useCanvasStore = create<CanvasState>((set, get) => {
     },
 
     updateNodeData: (nodeId, newData) => {
-      const updatedNodes = get().nodes.map((n) => n.id === nodeId ? { ...n, data: { ...n.data, ...newData } } : n);
+      const updatedNodes: BlueprintNode[] = get().nodes.map((n) => {
+        if (n.id !== nodeId || n.type !== 'featureNode') return n;
+        return {
+          ...n,
+          data: { ...n.data, ...newData },
+        } as FeatureNode;
+      });
       const updatedJSON = generateExportJSON(get().systemName, updatedNodes, get().edges);
       set({ nodes: updatedNodes, currentJSON: updatedJSON });
       get()._saveToCurrentProject(updatedJSON);
@@ -402,21 +414,48 @@ export const useCanvasStore = create<CanvasState>((set, get) => {
 
     addTask: (nodeId, text) => {
       if (!text.trim()) return;
-      const updatedNodes = get().nodes.map((n) => n.id === nodeId ? { ...n, data: { ...n.data, tasks: [...(n.data.tasks || []), { id: `t-${Date.now()}`, text, done: false }] } } : n);
+      const updatedNodes: BlueprintNode[] = get().nodes.map((n) => {
+        if (n.id !== nodeId || n.type !== 'featureNode') return n;
+        return {
+          ...n,
+          data: {
+            ...n.data,
+            tasks: [...n.data.tasks, { id: `t-${Date.now()}`, text, done: false }],
+          },
+        } as FeatureNode;
+      });
       const updatedJSON = generateExportJSON(get().systemName, updatedNodes, get().edges);
       set({ nodes: updatedNodes, currentJSON: updatedJSON });
       get()._saveToCurrentProject(updatedJSON);
     },
 
     deleteTask: (nodeId, taskId) => {
-      const updatedNodes = get().nodes.map((n) => n.id === nodeId ? { ...n, data: { ...n.data, tasks: (n.data.tasks || []).filter(t => t.id !== taskId) } } : n);
+      const updatedNodes: BlueprintNode[] = get().nodes.map((n) => {
+        if (n.id !== nodeId || n.type !== 'featureNode') return n;
+        return {
+          ...n,
+          data: {
+            ...n.data,
+            tasks: n.data.tasks.filter((t) => t.id !== taskId),
+          },
+        } as FeatureNode;
+      });
       const updatedJSON = generateExportJSON(get().systemName, updatedNodes, get().edges);
       set({ nodes: updatedNodes, currentJSON: updatedJSON });
       get()._saveToCurrentProject(updatedJSON);
     },
 
     toggleTask: (nodeId, taskId) => {
-      const updatedNodes = get().nodes.map((node) => node.id === nodeId ? { ...node, data: { ...node.data, tasks: (node.data.tasks || []).map((task) => task.id === taskId ? { ...task, done: !task.done } : task ) } } : node);
+      const updatedNodes: BlueprintNode[] = get().nodes.map((node) => {
+        if (node.id !== nodeId || node.type !== 'featureNode') return node;
+        return {
+          ...node,
+          data: {
+            ...node.data,
+            tasks: node.data.tasks.map((task) => task.id === taskId ? { ...task, done: !task.done } : task),
+          },
+        } as FeatureNode;
+      });
       const updatedJSON = generateExportJSON(get().systemName, updatedNodes, get().edges);
       set({ nodes: updatedNodes, currentJSON: updatedJSON });
       get()._saveToCurrentProject(updatedJSON);
@@ -453,7 +492,7 @@ export const useCanvasStore = create<CanvasState>((set, get) => {
 
         const hasSavedPositions = data.nodes.length > 0 && data.nodes.every((n: any) => n.position && typeof n.position.x === 'number');
 
-        const newNodes: Node<FeatureNodeData>[] = data.nodes.map((n: any) => {
+        const newNodes: BlueprintNode[] = data.nodes.map((n: any) => {
           const isGroup = n.type === "groupNode";
           const isSticky = n.type === "stickyNote";
           const resolvedType = isGroup ? "groupNode" : isSticky ? "stickyNote" : "featureNode";
@@ -467,22 +506,46 @@ export const useCanvasStore = create<CanvasState>((set, get) => {
             };
           }
 
+          if (isGroup) {
           return {
-            id: n.id, 
-            type: resolvedType, 
-            parentId: n.parentId || undefined, 
+            id: n.id,
+            type: 'groupNode',
+            parentId: n.parentId || undefined,
             position: n.position ? { x: n.position.x, y: n.position.y } : { x: 0, y: 0 },
-            style: nodeStyle, // ยัดขนาดกลับเข้าสไตล์ของโหนด
-            data: {
-              label: n.label || n.id,
-              category: isSticky ? undefined : (n.category || "Scripting"),
-              priority: isSticky ? undefined : (n.priority || "low"),
-              status: isSticky ? undefined : (n.status || "planned"),
-              tasks: (isGroup || isSticky) ? [] : (n.tasks || []).map((t: any, i: number) => ({
-                id: `task-${i}-${Date.now()}`, text: typeof t === "object" ? t.text : String(t), done: typeof t === "object" ? !!t.done : false,
-              })),
-            },
-          };
+            style: nodeStyle,
+            data: { label: n.label || n.id },
+          } as GroupNode;
+        }
+
+        if (isSticky) {
+          return {
+            id: n.id,
+            type: 'stickyNote',
+            parentId: n.parentId || undefined,
+            position: n.position ? { x: n.position.x, y: n.position.y } : { x: 0, y: 0 },
+            style: nodeStyle,
+            data: { label: n.label || n.id },
+          } as StickyNoteNode;
+        }
+
+        return {
+          id: n.id,
+          type: 'featureNode',
+          parentId: n.parentId || undefined,
+          position: n.position ? { x: n.position.x, y: n.position.y } : { x: 0, y: 0 },
+          style: nodeStyle,
+          data: {
+            label: n.label || n.id,
+            category: n.category || 'Scripting',
+            priority: n.priority || 'low',
+            status: n.status || 'planned',
+            tasks: (n.tasks || []).map((t: any, i: number) => ({
+              id: `task-${i}-${Date.now()}`,
+              text: typeof t === 'object' ? t.text : String(t),
+              done: typeof t === 'object' ? !!t.done : false,
+            })),
+          },
+        } as FeatureNode;
         });
 
         const newEdges: Edge[] = (data.edges || []).map((e: any, i: number) => ({

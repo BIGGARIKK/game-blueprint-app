@@ -1,7 +1,7 @@
 import React from 'react';
-import { NodeProps } from '@xyflow/react';
+import { Node, NodeProps } from '@xyflow/react';
 
-export default function StickyNote({ data, selected }: NodeProps<{ label: string }>) {
+export default function StickyNote({ data, selected }: NodeProps<Node<{ label: string }, 'stickyNote'>>) {
   return (
     // ดีไซน์ทรงสี่เหลี่ยมจตุรัส สีเหลืองนวลโปร่งแสง สไตล์ Post-it
     <div className={`w-48 h-48 p-4 bg-amber-200/90 backdrop-blur-sm border-2 transition-all shadow-lg rotate-1 ${
